@@ -28,11 +28,12 @@ is-it-maintained-open-issues = { repository = "Razican/vsop87-rs" }
 
 [features]
 default = ["simd"]
-no_std = ["libm"]
+no_std = ["libm", "num-traits/libm"]
 simd = []
 
 [dependencies]
 libm = { version = "0.2.8", optional = true }
+num-traits = { version = "0.2.8" }
 
 [dev-dependencies]
 rand = "0.8.5"

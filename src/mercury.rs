@@ -3,6 +3,173 @@ use core::f64::consts::PI;
 #[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
 
+use num_traits::float::Float;
+
+pub trait Constants<F: Float> {
+    const A0: [[F; 496]; 3];
+    const A1: [[F; 225]; 3];
+    const A2: [[F; 42]; 3];
+
+    const L0: [[F; 810]; 3];
+    const L1: [[F; 370]; 3];
+    const L2: [[F; 80]; 3];
+    const L3: [[F; 1]; 3];
+
+    const K0: [[F; 659]; 3];
+    const K1: [[F; 294]; 3];
+    const K2: [[F; 57]; 3];
+    const K3: [[F; 1]; 3];
+    const K4: [[F; 1]; 3];
+    const K5: [[F; 1]; 3];
+
+    const H0: [[F; 658]; 3];
+    const H1: [[F; 312]; 3];
+    const H2: [[F; 56]; 3];
+    const H3: [[F; 1]; 3];
+    const H4: [[F; 1]; 3];
+    const H5: [[F; 1]; 3];
+
+    const Q0: [[F; 249]; 3];
+    const Q1: [[F; 89]; 3];
+    const Q2: [[F; 11]; 3];
+    const Q3: [[F; 1]; 3];
+    const Q4: [[F; 1]; 3];
+    const Q5: [[F; 1]; 3];
+
+    const P0: [[F; 272]; 3];
+    const P1: [[F; 106]; 3];
+    const P2: [[F; 13]; 3];
+    const P3: [[F; 1]; 3];
+    const P4: [[F; 1]; 3];
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Mercury;
+
+impl Constants<f64> for Mercury {
+    const A0: [[f64; 496]; 3] = A0;
+
+    const A1: [[f64; 225]; 3] = A1;
+
+    const A2: [[f64; 42]; 3] = A2;
+
+    const L0: [[f64; 810]; 3] = L0;
+
+    const L1: [[f64; 370]; 3] = L1;
+
+    const L2: [[f64; 80]; 3] = L2;
+
+    const L3: [[f64; 1]; 3] = L3;
+
+    const K0: [[f64; 659]; 3] = K0;
+
+    const K1: [[f64; 294]; 3] = K1;
+
+    const K2: [[f64; 57]; 3] = K2;
+
+    const K3: [[f64; 1]; 3] = K3;
+
+    const K4: [[f64; 1]; 3] = K4;
+
+    const K5: [[f64; 1]; 3] = K5;
+
+    const H0: [[f64; 658]; 3] = H0;
+
+    const H1: [[f64; 312]; 3] = H1;
+
+    const H2: [[f64; 56]; 3] = H2;
+
+    const H3: [[f64; 1]; 3] = H3;
+
+    const H4: [[f64; 1]; 3] = H4;
+
+    const H5: [[f64; 1]; 3] = H5;
+
+    const Q0: [[f64; 249]; 3] = Q0;
+
+    const Q1: [[f64; 89]; 3] = Q1;
+
+    const Q2: [[f64; 11]; 3] = Q2;
+
+    const Q3: [[f64; 1]; 3] = Q3;
+
+    const Q4: [[f64; 1]; 3] = Q4;
+
+    const Q5: [[f64; 1]; 3] = Q5;
+
+    const P0: [[f64; 272]; 3] = P0;
+
+    const P1: [[f64; 106]; 3] = P1;
+
+    const P2: [[f64; 13]; 3] = P2;
+
+    const P3: [[f64; 1]; 3] = P3;
+
+    const P4: [[f64; 1]; 3] = P4;
+}
+
+impl Constants<f32> for Mercury {
+    const A0: [[f32; 496]; 3] = todo!();
+
+    const A1: [[f32; 225]; 3] = todo!();
+
+    const A2: [[f32; 42]; 3] = todo!();
+
+    const L0: [[f32; 810]; 3] = todo!();
+
+    const L1: [[f32; 370]; 3] = todo!();
+
+    const L2: [[f32; 80]; 3] = todo!();
+
+    const L3: [[f32; 1]; 3] = todo!();
+
+    const K0: [[f32; 659]; 3] = todo!();
+
+    const K1: [[f32; 294]; 3] = todo!();
+
+    const K2: [[f32; 57]; 3] = todo!();
+
+    const K3: [[f32; 1]; 3] = todo!();
+
+    const K4: [[f32; 1]; 3] = todo!();
+
+    const K5: [[f32; 1]; 3] = todo!();
+
+    const H0: [[f32; 658]; 3] = todo!();
+
+    const H1: [[f32; 312]; 3] = todo!();
+
+    const H2: [[f32; 56]; 3] = todo!();
+
+    const H3: [[f32; 1]; 3] = todo!();
+
+    const H4: [[f32; 1]; 3] = todo!();
+
+    const H5: [[f32; 1]; 3] = todo!();
+
+    const Q0: [[f32; 249]; 3] = todo!();
+
+    const Q1: [[f32; 89]; 3] = todo!();
+
+    const Q2: [[f32; 11]; 3] = todo!();
+
+    const Q3: [[f32; 1]; 3] = todo!();
+
+    const Q4: [[f32; 1]; 3] = todo!();
+
+    const Q5: [[f32; 1]; 3] = todo!();
+
+    const P0: [[f32; 272]; 3] = todo!();
+
+    const P1: [[f32; 106]; 3] = todo!();
+
+    const P2: [[f32; 13]; 3] = todo!();
+
+    const P3: [[f32; 1]; 3] = todo!();
+
+    const P4: [[f32; 1]; 3] = todo!();
+}
+
 pub(crate) const A0: [[f64; 496]; 3] = [
     [
         0.38709830982,

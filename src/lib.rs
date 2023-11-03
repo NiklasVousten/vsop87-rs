@@ -176,6 +176,8 @@ mod saturn;
 mod uranus;
 mod venus;
 
+use crate::mercury::{Mercury, Constants as MercuryConstants};
+
 #[cfg(feature = "no_std")]
 use core::f64::consts::PI;
 #[cfg(feature = "no_std")]
@@ -184,25 +186,27 @@ use libm::{acos, asin, atan, cos, sin, sincos, sqrt};
 #[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
 
+use num_traits::float::{Float, FloatConst};
+
 /// Structure representing the keplerian elements of an orbit.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct KeplerianElements {
-    ecc: f64,
-    sma: f64,
-    incl: f64,
-    lan: f64,
-    lper: f64,
-    l0: f64,
+pub struct KeplerianElements<F: Float = f64> {
+    ecc: F,
+    sma: F,
+    incl: F,
+    lan: F,
+    lper: F,
+    l0: F,
 }
 
-impl KeplerianElements {
+impl<F: Float> KeplerianElements<F> {
     /// Gets the eccentricity of the orbit (*e*).
     ///
     /// A number smaller to one would be a closed ellipse, while 0 would be a circle orbit. Values
     /// higher than one would be hyperbolic orbits, that are not closed, while a 1 would be a
     /// parabolic orbit. Negative values cannot exist.
     #[must_use]
-    pub fn eccentricity(&self) -> f64 {
+    pub fn eccentricity(&self) -> F {
         self.ecc
     }
 
@@ -210,7 +214,7 @@ impl KeplerianElements {
     ///
     /// This value represents the average distance from the orbiting body to the center of mass.
     #[must_use]
-    pub fn semimajor_axis(&self) -> f64 {
+    pub fn semimajor_axis(&self) -> F {
         self.sma
     }
 
@@ -219,7 +223,7 @@ impl KeplerianElements {
     /// This value represents the inclination of the plane where the object is orbiting with
     /// respect to the reference plane.
     #[must_use]
-    pub fn inclination(&self) -> f64 {
+    pub fn inclination(&self) -> F {
         self.incl
     }
 
@@ -228,7 +232,7 @@ impl KeplerianElements {
     /// This value represents the angle in the orbit ellipse of the point where the reference plane
     /// and the orbit plane cross when the orbiting body crosses the plane *ascending* in the orbit.
     #[must_use]
-    pub fn ascending_node(&self) -> f64 {
+    pub fn ascending_node(&self) -> F {
         self.lan
     }
 
@@ -237,7 +241,7 @@ impl KeplerianElements {
     /// This value represents the angle in the orbit ellipse of the nearest point of the orbit to
     /// the center of mass of the system.
     #[must_use]
-    pub fn periapsis(&self) -> f64 {
+    pub fn periapsis(&self) -> F {
         self.lper
     }
 
@@ -246,14 +250,14 @@ impl KeplerianElements {
     /// This value represents the angle in the orbit ellipse of the orbiting body at the given
     /// moment.
     #[must_use]
-    pub fn mean_anomaly(&self) -> f64 {
+    pub fn mean_anomaly(&self) -> F {
         self.l0
     }
 }
 
-impl From<VSOP87Elements> for KeplerianElements {
+impl<F: Float> From<VSOP87Elements<F>> for KeplerianElements<F> {
     #[inline]
-    fn from(elts: VSOP87Elements) -> Self {
+    fn from(elts: VSOP87Elements<F>) -> Self {
         #[cfg(feature = "no_std")]
         {
             let ecc = sqrt(elts.h * elts.h + elts.k * elts.k);
@@ -274,7 +278,9 @@ impl From<VSOP87Elements> for KeplerianElements {
         #[cfg(not(feature = "no_std"))]
         {
             let ecc = (elts.h * elts.h + elts.k * elts.k).sqrt();
-            let i = (1_f64 - 2_f64 * (elts.p * elts.p + elts.q * elts.q)).acos();
+            let i = (F::one()
+                - F::from(2.0).unwrap() * (elts.p * elts.p + elts.q * elts.q))
+                .acos();
             let lan = (elts.p / elts.q).atan();
             let lper = (elts.h / ecc).asin();
 
@@ -292,31 +298,31 @@ impl From<VSOP87Elements> for KeplerianElements {
 
 /// Structure representing 3 dimensional rectangular coordinates.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct RectangularCoordinates {
+pub struct RectangularCoordinates<F: Float = f64> {
     /// X coordinate.
-    pub x: f64,
+    pub x: F,
     /// Y coordinate.
-    pub y: f64,
+    pub y: F,
     /// Z coordinate.
-    pub z: f64,
+    pub z: F,
 }
 
 /// Structure representing spherical coordinates of a body.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct SphericalCoordinates {
-    lon: f64,
-    lat: f64,
-    dist: f64,
+pub struct SphericalCoordinates<F: Float = f64> {
+    lon: F,
+    lat: F,
+    dist: F,
 }
 
-impl SphericalCoordinates {
+impl<F: Float> SphericalCoordinates<F> {
     /// Gets the ecliptic longitude of the body, in radians.
     ///
     /// This value represents the angular distance of an object along the ecliptic plane from the
     /// primary direction. In the case of heliocentric coordinates, it represents the *l* parameter,
     /// in geocentric coordinates, represents the *λ* parameter.
     #[must_use]
-    pub fn longitude(&self) -> f64 {
+    pub fn longitude(&self) -> F {
         self.lon
     }
 
@@ -326,7 +332,7 @@ impl SphericalCoordinates {
     /// ecliptic pole. In the case of heliocentric coordinates, it represents the *b* parameter, in
     /// geocentric coordinates, represents the *β* parameter.
     #[must_use]
-    pub fn latitude(&self) -> f64 {
+    pub fn latitude(&self) -> F {
         self.lat
     }
 
@@ -335,20 +341,20 @@ impl SphericalCoordinates {
     /// In the case of heliocentric coordinates, it represents the *r* parameter, in geocentric
     /// coordinates, represents the *Δ* parameter.
     #[must_use]
-    pub fn distance(&self) -> f64 {
+    pub fn distance(&self) -> F {
         self.dist
     }
 }
 
 /// Calculates the time variable for VSOP87.
 #[inline]
-fn calculate_t(jde: f64) -> f64 {
-    (jde - 2_451_545_f64) / 365_250_f64
+fn calculate_t<F: Float>(jde: F) -> F {
+    (jde - F::from(2_451_545.0).unwrap()) / F::from(365_250.0).unwrap()
 }
 
 /// Calculates the given variable.
 #[inline]
-fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+fn calculate_var<F: Float>(t: F, a: &[F], b: &[F], c: &[F]) -> F {
     #[cfg(all(
         any(target_arch = "x86", target_arch = "x86_64"),
         feature = "simd",
@@ -356,12 +362,12 @@ fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
     ))]
     #[allow(unsafe_code)]
     {
-        if is_x86_feature_detected!("avx") {
+        //if is_x86_feature_detected!("avx") {
             // Safe because we already checked that we have AVX instruction set.
-            unsafe { calculate_var_avx(t, a, b, c) }
-        } else {
+        //    unsafe { calculate_var_avx(t, a, b, c) }
+        //} else {
             calculate_var_fallback(t, a, b, c)
-        }
+        //}
     }
 
     #[cfg(any(
@@ -378,13 +384,15 @@ fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
 ///
 /// Used in systems without SIMD support.
 #[inline]
-fn calculate_var_fallback(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+fn calculate_var_fallback<F: Float>(t: F, a: &[F], b: &[F], c: &[F]) -> F {
     #[cfg(not(feature = "no_std"))]
     {
         a.iter()
             .zip(b)
             .zip(c)
-            .fold(0_f64, |term, ((a, b), c)| term + a * (b + c * t).cos())
+            .fold(F::zero(), |term, ((&a, &b), &c)| {
+                term + a * (b + c * t).cos()
+            })
     }
 
     #[cfg(feature = "no_std")]
@@ -403,7 +411,7 @@ fn calculate_var_fallback(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
     feature = "simd",
     not(feature = "no_std")
 ))]
-#[allow(unsafe_code)]
+#[allow(unsafe_code, unused)]
 unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
     #[cfg(feature = "no_std")]
     use core::{f64, mem};
@@ -501,28 +509,28 @@ unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
 ///
 /// More information can be found [here](http://totaleclipse.eu/Astronomy/VSOP87.html).
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct VSOP87Elements {
+pub struct VSOP87Elements<F: Float = f64> {
     /// Semimajor axis in astronomical units (*AU*).
-    pub a: f64,
+    pub a: F,
     /// Mean longitude at epoch.
-    pub l: f64,
+    pub l: F,
     /// `e * lper.cos()``, where *e* is the eccentricity and *lper* is the longitude of the
     /// perihelion.
-    pub k: f64,
+    pub k: F,
     /// `e * lper.sin()``, where *e* is the eccentricity and *lper* is the longitude of the
     /// perihelion (*ϖ*).
-    pub h: f64,
+    pub h: F,
     /// `(i/2.0).sin() * lan.cos()` where *i* is inclination and *lan is the longitude of the
     /// ascending node (*Ω*).
-    pub q: f64,
+    pub q: F,
     /// `(i/2.0).sin() * lan.sin()` where *i* is inclination and *lan is the longitude of the
     /// ascending node (*Ω*).
-    pub p: f64,
+    pub p: F,
 }
 
-impl From<KeplerianElements> for VSOP87Elements {
+impl<F: Float> From<KeplerianElements<F>> for VSOP87Elements<F> {
     #[inline]
-    fn from(elts: KeplerianElements) -> Self {
+    fn from(elts: KeplerianElements<F>) -> Self {
         #[cfg(feature = "no_std")]
         {
             let (lper_sin, lper_cos) = sincos(elts.lper);
@@ -542,7 +550,7 @@ impl From<KeplerianElements> for VSOP87Elements {
         {
             let (lper_sin, lper_cos) = elts.lper.sin_cos();
             let (lan_sin, lan_cos) = elts.lan.sin_cos();
-            let incl_sin = (elts.incl / 2.0).sin();
+            let incl_sin = (elts.incl / F::from(2.0).unwrap()).sin();
             Self {
                 a: elts.sma,
                 l: elts.l0,
@@ -589,44 +597,197 @@ impl From<KeplerianElements> for VSOP87Elements {
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
 #[must_use]
-pub fn mercury(jde: f64) -> VSOP87Elements {
+pub fn mercury<F: Float + FloatConst>(jde: F) -> VSOP87Elements<F>
+where
+    Mercury: MercuryConstants<F>,
+{
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &mercury::A0[0], &mercury::A0[1], &mercury::A0[2]);
-    let a1 = calculate_var(t, &mercury::A1[0], &mercury::A1[1], &mercury::A1[2]);
-    let a2 = calculate_var(t, &mercury::A2[0], &mercury::A2[1], &mercury::A2[2]);
+    let a0 = calculate_var::<F>(
+        t,
+        &Mercury::A0[0],
+        &Mercury::A0[1],
+        &Mercury::A0[2],
+    );
+    let a1 = calculate_var::<F>(
+        t,
+        &Mercury::A1[0],
+        &Mercury::A1[1],
+        &Mercury::A1[2],
+    );
+    let a2 = calculate_var::<F>(
+        t,
+        &Mercury::A2[0],
+        &Mercury::A2[1],
+        &Mercury::A2[2],
+    );
 
-    let l0 = calculate_var(t, &mercury::L0[0], &mercury::L0[1], &mercury::L0[2]);
-    let l1 = calculate_var(t, &mercury::L1[0], &mercury::L1[1], &mercury::L1[2]);
-    let l2 = calculate_var(t, &mercury::L2[0], &mercury::L2[1], &mercury::L2[2]);
-    let l3 = calculate_var(t, &mercury::L3[0], &mercury::L3[1], &mercury::L3[2]);
+    let l0 = calculate_var::<F>(
+        t,
+        &Mercury::L0[0],
+        &Mercury::L0[1],
+        &Mercury::L0[2],
+    );
+    let l1 = calculate_var::<F>(
+        t,
+        &Mercury::L1[0],
+        &Mercury::L1[1],
+        &Mercury::L1[2],
+    );
+    let l2 = calculate_var::<F>(
+        t,
+        &Mercury::L2[0],
+        &Mercury::L2[1],
+        &Mercury::L2[2],
+    );
+    let l3 = calculate_var::<F>(
+        t,
+        &Mercury::L3[0],
+        &Mercury::L3[1],
+        &Mercury::L3[2],
+    );
 
-    let k0 = calculate_var(t, &mercury::K0[0], &mercury::K0[1], &mercury::K0[2]);
-    let k1 = calculate_var(t, &mercury::K1[0], &mercury::K1[1], &mercury::K1[2]);
-    let k2 = calculate_var(t, &mercury::K2[0], &mercury::K2[1], &mercury::K2[2]);
-    let k3 = calculate_var(t, &mercury::K3[0], &mercury::K3[1], &mercury::K3[2]);
-    let k4 = calculate_var(t, &mercury::K4[0], &mercury::K4[1], &mercury::K4[2]);
-    let k5 = calculate_var(t, &mercury::K5[0], &mercury::K5[1], &mercury::K5[2]);
+    let k0 = calculate_var::<F>(
+        t,
+        &Mercury::K0[0],
+        &Mercury::K0[1],
+        &Mercury::K0[2],
+    );
+    let k1 = calculate_var::<F>(
+        t,
+        &Mercury::K1[0],
+        &Mercury::K1[1],
+        &Mercury::K1[2],
+    );
+    let k2 = calculate_var::<F>(
+        t,
+        &Mercury::K2[0],
+        &Mercury::K2[1],
+        &Mercury::K2[2],
+    );
+    let k3 = calculate_var::<F>(
+        t,
+        &Mercury::K3[0],
+        &Mercury::K3[1],
+        &Mercury::K3[2],
+    );
+    let k4 = calculate_var::<F>(
+        t,
+        &Mercury::K4[0],
+        &Mercury::K4[1],
+        &Mercury::K4[2],
+    );
+    let k5 = calculate_var::<F>(
+        t,
+        &Mercury::K5[0],
+        &Mercury::K5[1],
+        &Mercury::K5[2],
+    );
 
-    let h0 = calculate_var(t, &mercury::H0[0], &mercury::H0[1], &mercury::H0[2]);
-    let h1 = calculate_var(t, &mercury::H1[0], &mercury::H1[1], &mercury::H1[2]);
-    let h2 = calculate_var(t, &mercury::H2[0], &mercury::H2[1], &mercury::H2[2]);
-    let h3 = calculate_var(t, &mercury::H3[0], &mercury::H3[1], &mercury::H3[2]);
-    let h4 = calculate_var(t, &mercury::H4[0], &mercury::H4[1], &mercury::H4[2]);
-    let h5 = calculate_var(t, &mercury::H5[0], &mercury::H5[1], &mercury::H5[2]);
+    let h0 = calculate_var::<F>(
+        t,
+        &Mercury::H0[0],
+        &Mercury::H0[1],
+        &Mercury::H0[2],
+    );
+    let h1 = calculate_var::<F>(
+        t,
+        &Mercury::H1[0],
+        &Mercury::H1[1],
+        &Mercury::H1[2],
+    );
+    let h2 = calculate_var::<F>(
+        t,
+        &Mercury::H2[0],
+        &Mercury::H2[1],
+        &Mercury::H2[2],
+    );
+    let h3 = calculate_var::<F>(
+        t,
+        &Mercury::H3[0],
+        &Mercury::H3[1],
+        &Mercury::H3[2],
+    );
+    let h4 = calculate_var::<F>(
+        t,
+        &Mercury::H4[0],
+        &Mercury::H4[1],
+        &Mercury::H4[2],
+    );
+    let h5 = calculate_var::<F>(
+        t,
+        &Mercury::H5[0],
+        &Mercury::H5[1],
+        &Mercury::H5[2],
+    );
 
-    let q0 = calculate_var(t, &mercury::Q0[0], &mercury::Q0[1], &mercury::Q0[2]);
-    let q1 = calculate_var(t, &mercury::Q1[0], &mercury::Q1[1], &mercury::Q1[2]);
-    let q2 = calculate_var(t, &mercury::Q2[0], &mercury::Q2[1], &mercury::Q2[2]);
-    let q3 = calculate_var(t, &mercury::Q3[0], &mercury::Q3[1], &mercury::Q3[2]);
-    let q4 = calculate_var(t, &mercury::Q4[0], &mercury::Q4[1], &mercury::Q4[2]);
-    let q5 = calculate_var(t, &mercury::Q5[0], &mercury::Q5[1], &mercury::Q5[2]);
+    let q0 = calculate_var::<F>(
+        t,
+        &Mercury::Q0[0],
+        &Mercury::Q0[1],
+        &Mercury::Q0[2],
+    );
+    let q1 = calculate_var::<F>(
+        t,
+        &Mercury::Q1[0],
+        &Mercury::Q1[1],
+        &Mercury::Q1[2],
+    );
+    let q2 = calculate_var::<F>(
+        t,
+        &Mercury::Q2[0],
+        &Mercury::Q2[1],
+        &Mercury::Q2[2],
+    );
+    let q3 = calculate_var::<F>(
+        t,
+        &Mercury::Q3[0],
+        &Mercury::Q3[1],
+        &Mercury::Q3[2],
+    );
+    let q4 = calculate_var::<F>(
+        t,
+        &Mercury::Q4[0],
+        &Mercury::Q4[1],
+        &Mercury::Q4[2],
+    );
+    let q5 = calculate_var::<F>(
+        t,
+        &Mercury::Q5[0],
+        &Mercury::Q5[1],
+        &Mercury::Q5[2],
+    );
 
-    let p0 = calculate_var(t, &mercury::P0[0], &mercury::P0[1], &mercury::P0[2]);
-    let p1 = calculate_var(t, &mercury::P1[0], &mercury::P1[1], &mercury::P1[2]);
-    let p2 = calculate_var(t, &mercury::P2[0], &mercury::P2[1], &mercury::P2[2]);
-    let p3 = calculate_var(t, &mercury::P3[0], &mercury::P3[1], &mercury::P3[2]);
-    let p4 = calculate_var(t, &mercury::P4[0], &mercury::P4[1], &mercury::P4[2]);
+    let p0 = calculate_var::<F>(
+        t,
+        &Mercury::P0[0],
+        &Mercury::P0[1],
+        &Mercury::P0[2],
+    );
+    let p1 = calculate_var::<F>(
+        t,
+        &Mercury::P1[0],
+        &Mercury::P1[1],
+        &Mercury::P1[2],
+    );
+    let p2 = calculate_var::<F>(
+        t,
+        &Mercury::P2[0],
+        &Mercury::P2[1],
+        &Mercury::P2[2],
+    );
+    let p3 = calculate_var::<F>(
+        t,
+        &Mercury::P3[0],
+        &Mercury::P3[1],
+        &Mercury::P3[2],
+    );
+    let p4 = calculate_var::<F>(
+        t,
+        &Mercury::P4[0],
+        &Mercury::P4[1],
+        &Mercury::P4[2],
+    );
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
@@ -635,7 +796,7 @@ pub fn mercury(jde: f64) -> VSOP87Elements {
     let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2;
-    let l = (l0 + l1 * t + l2 * t2 + l3 * t3) % (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3) % (F::from(2.0).unwrap() * F::PI());
     let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
     let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
     let q = q0 + q1 * t + q2 * t2 + q3 * t3 + q4 * t4 + q5 * t5;
@@ -643,7 +804,7 @@ pub fn mercury(jde: f64) -> VSOP87Elements {
 
     VSOP87Elements {
         a,
-        l: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        l: if l > F::zero() { l } else { F::from(2.0).unwrap() * F::PI() + l },
         k,
         h,
         q,
