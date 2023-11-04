@@ -599,194 +599,194 @@ impl<F: Float> From<KeplerianElements<F>> for VSOP87Elements<F> {
 #[must_use]
 pub fn mercury<F: Float + FloatConst>(jde: F) -> VSOP87Elements<F>
 where
-    Mercury: MercuryConstants<F>,
+    Mercury: MercuryConstants<f64>,
 {
     let t = calculate_t(jde);
 
     let a0 = calculate_var::<F>(
         t,
-        &Mercury::A0[0],
-        &Mercury::A0[1],
-        &Mercury::A0[2],
+        &Mercury::A0[0].map(F::from).map(Option::unwrap),
+        &Mercury::A0[1].map(F::from).map(Option::unwrap),
+        &Mercury::A0[2].map(F::from).map(Option::unwrap),
     );
     let a1 = calculate_var::<F>(
         t,
-        &Mercury::A1[0],
-        &Mercury::A1[1],
-        &Mercury::A1[2],
+        &Mercury::A1[0].map(F::from).map(Option::unwrap),
+        &Mercury::A1[1].map(F::from).map(Option::unwrap),
+        &Mercury::A1[2].map(F::from).map(Option::unwrap),
     );
     let a2 = calculate_var::<F>(
         t,
-        &Mercury::A2[0],
-        &Mercury::A2[1],
-        &Mercury::A2[2],
+        &Mercury::A2[0].map(F::from).map(Option::unwrap),
+        &Mercury::A2[1].map(F::from).map(Option::unwrap),
+        &Mercury::A2[2].map(F::from).map(Option::unwrap),
     );
 
     let l0 = calculate_var::<F>(
         t,
-        &Mercury::L0[0],
-        &Mercury::L0[1],
-        &Mercury::L0[2],
+        &Mercury::L0[0].map(F::from).map(Option::unwrap),
+        &Mercury::L0[1].map(F::from).map(Option::unwrap),
+        &Mercury::L0[2].map(F::from).map(Option::unwrap),
     );
     let l1 = calculate_var::<F>(
         t,
-        &Mercury::L1[0],
-        &Mercury::L1[1],
-        &Mercury::L1[2],
+        &Mercury::L1[0].map(F::from).map(Option::unwrap),
+        &Mercury::L1[1].map(F::from).map(Option::unwrap),
+        &Mercury::L1[2].map(F::from).map(Option::unwrap),
     );
     let l2 = calculate_var::<F>(
         t,
-        &Mercury::L2[0],
-        &Mercury::L2[1],
-        &Mercury::L2[2],
+        &Mercury::L2[0].map(F::from).map(Option::unwrap),
+        &Mercury::L2[1].map(F::from).map(Option::unwrap),
+        &Mercury::L2[2].map(F::from).map(Option::unwrap),
     );
     let l3 = calculate_var::<F>(
         t,
-        &Mercury::L3[0],
-        &Mercury::L3[1],
-        &Mercury::L3[2],
+        &Mercury::L3[0].map(F::from).map(Option::unwrap),
+        &Mercury::L3[1].map(F::from).map(Option::unwrap),
+        &Mercury::L3[2].map(F::from).map(Option::unwrap),
     );
 
     let k0 = calculate_var::<F>(
         t,
-        &Mercury::K0[0],
-        &Mercury::K0[1],
-        &Mercury::K0[2],
+        &Mercury::K0[0].map(F::from).map(Option::unwrap),
+        &Mercury::K0[1].map(F::from).map(Option::unwrap),
+        &Mercury::K0[2].map(F::from).map(Option::unwrap),
     );
     let k1 = calculate_var::<F>(
         t,
-        &Mercury::K1[0],
-        &Mercury::K1[1],
-        &Mercury::K1[2],
+        &Mercury::K1[0].map(F::from).map(Option::unwrap),
+        &Mercury::K1[1].map(F::from).map(Option::unwrap),
+        &Mercury::K1[2].map(F::from).map(Option::unwrap),
     );
     let k2 = calculate_var::<F>(
         t,
-        &Mercury::K2[0],
-        &Mercury::K2[1],
-        &Mercury::K2[2],
+        &Mercury::K2[0].map(F::from).map(Option::unwrap),
+        &Mercury::K2[1].map(F::from).map(Option::unwrap),
+        &Mercury::K2[2].map(F::from).map(Option::unwrap),
     );
     let k3 = calculate_var::<F>(
         t,
-        &Mercury::K3[0],
-        &Mercury::K3[1],
-        &Mercury::K3[2],
+        &Mercury::K3[0].map(F::from).map(Option::unwrap),
+        &Mercury::K3[1].map(F::from).map(Option::unwrap),
+        &Mercury::K3[2].map(F::from).map(Option::unwrap),
     );
     let k4 = calculate_var::<F>(
         t,
-        &Mercury::K4[0],
-        &Mercury::K4[1],
-        &Mercury::K4[2],
+        &Mercury::K4[0].map(F::from).map(Option::unwrap),
+        &Mercury::K4[1].map(F::from).map(Option::unwrap),
+        &Mercury::K4[2].map(F::from).map(Option::unwrap),
     );
     let k5 = calculate_var::<F>(
         t,
-        &Mercury::K5[0],
-        &Mercury::K5[1],
-        &Mercury::K5[2],
+        &Mercury::K5[0].map(F::from).map(Option::unwrap),
+        &Mercury::K5[1].map(F::from).map(Option::unwrap),
+        &Mercury::K5[2].map(F::from).map(Option::unwrap),
     );
 
     let h0 = calculate_var::<F>(
         t,
-        &Mercury::H0[0],
-        &Mercury::H0[1],
-        &Mercury::H0[2],
+        &Mercury::H0[0].map(F::from).map(Option::unwrap),
+        &Mercury::H0[1].map(F::from).map(Option::unwrap),
+        &Mercury::H0[2].map(F::from).map(Option::unwrap),
     );
     let h1 = calculate_var::<F>(
         t,
-        &Mercury::H1[0],
-        &Mercury::H1[1],
-        &Mercury::H1[2],
+        &Mercury::H1[0].map(F::from).map(Option::unwrap),
+        &Mercury::H1[1].map(F::from).map(Option::unwrap),
+        &Mercury::H1[2].map(F::from).map(Option::unwrap),
     );
     let h2 = calculate_var::<F>(
         t,
-        &Mercury::H2[0],
-        &Mercury::H2[1],
-        &Mercury::H2[2],
+        &Mercury::H2[0].map(F::from).map(Option::unwrap),
+        &Mercury::H2[1].map(F::from).map(Option::unwrap),
+        &Mercury::H2[2].map(F::from).map(Option::unwrap),
     );
     let h3 = calculate_var::<F>(
         t,
-        &Mercury::H3[0],
-        &Mercury::H3[1],
-        &Mercury::H3[2],
+        &Mercury::H3[0].map(F::from).map(Option::unwrap),
+        &Mercury::H3[1].map(F::from).map(Option::unwrap),
+        &Mercury::H3[2].map(F::from).map(Option::unwrap),
     );
     let h4 = calculate_var::<F>(
         t,
-        &Mercury::H4[0],
-        &Mercury::H4[1],
-        &Mercury::H4[2],
+        &Mercury::H4[0].map(F::from).map(Option::unwrap),
+        &Mercury::H4[1].map(F::from).map(Option::unwrap),
+        &Mercury::H4[2].map(F::from).map(Option::unwrap),
     );
     let h5 = calculate_var::<F>(
         t,
-        &Mercury::H5[0],
-        &Mercury::H5[1],
-        &Mercury::H5[2],
+        &Mercury::H5[0].map(F::from).map(Option::unwrap),
+        &Mercury::H5[1].map(F::from).map(Option::unwrap),
+        &Mercury::H5[2].map(F::from).map(Option::unwrap),
     );
 
     let q0 = calculate_var::<F>(
         t,
-        &Mercury::Q0[0],
-        &Mercury::Q0[1],
-        &Mercury::Q0[2],
+        &Mercury::Q0[0].map(F::from).map(Option::unwrap),
+        &Mercury::Q0[1].map(F::from).map(Option::unwrap),
+        &Mercury::Q0[2].map(F::from).map(Option::unwrap),
     );
     let q1 = calculate_var::<F>(
         t,
-        &Mercury::Q1[0],
-        &Mercury::Q1[1],
-        &Mercury::Q1[2],
+        &Mercury::Q1[0].map(F::from).map(Option::unwrap),
+        &Mercury::Q1[1].map(F::from).map(Option::unwrap),
+        &Mercury::Q1[2].map(F::from).map(Option::unwrap),
     );
     let q2 = calculate_var::<F>(
         t,
-        &Mercury::Q2[0],
-        &Mercury::Q2[1],
-        &Mercury::Q2[2],
+        &Mercury::Q2[0].map(F::from).map(Option::unwrap),
+        &Mercury::Q2[1].map(F::from).map(Option::unwrap),
+        &Mercury::Q2[2].map(F::from).map(Option::unwrap),
     );
     let q3 = calculate_var::<F>(
         t,
-        &Mercury::Q3[0],
-        &Mercury::Q3[1],
-        &Mercury::Q3[2],
+        &Mercury::Q3[0].map(F::from).map(Option::unwrap),
+        &Mercury::Q3[1].map(F::from).map(Option::unwrap),
+        &Mercury::Q3[2].map(F::from).map(Option::unwrap),
     );
     let q4 = calculate_var::<F>(
         t,
-        &Mercury::Q4[0],
-        &Mercury::Q4[1],
-        &Mercury::Q4[2],
+        &Mercury::Q4[0].map(F::from).map(Option::unwrap),
+        &Mercury::Q4[1].map(F::from).map(Option::unwrap),
+        &Mercury::Q4[2].map(F::from).map(Option::unwrap),
     );
     let q5 = calculate_var::<F>(
         t,
-        &Mercury::Q5[0],
-        &Mercury::Q5[1],
-        &Mercury::Q5[2],
+        &Mercury::Q5[0].map(F::from).map(Option::unwrap),
+        &Mercury::Q5[1].map(F::from).map(Option::unwrap),
+        &Mercury::Q5[2].map(F::from).map(Option::unwrap),
     );
 
     let p0 = calculate_var::<F>(
         t,
-        &Mercury::P0[0],
-        &Mercury::P0[1],
-        &Mercury::P0[2],
+        &Mercury::P0[0].map(F::from).map(Option::unwrap),
+        &Mercury::P0[1].map(F::from).map(Option::unwrap),
+        &Mercury::P0[2].map(F::from).map(Option::unwrap),
     );
     let p1 = calculate_var::<F>(
         t,
-        &Mercury::P1[0],
-        &Mercury::P1[1],
-        &Mercury::P1[2],
+        &Mercury::P1[0].map(F::from).map(Option::unwrap),
+        &Mercury::P1[1].map(F::from).map(Option::unwrap),
+        &Mercury::P1[2].map(F::from).map(Option::unwrap),
     );
     let p2 = calculate_var::<F>(
         t,
-        &Mercury::P2[0],
-        &Mercury::P2[1],
-        &Mercury::P2[2],
+        &Mercury::P2[0].map(F::from).map(Option::unwrap),
+        &Mercury::P2[1].map(F::from).map(Option::unwrap),
+        &Mercury::P2[2].map(F::from).map(Option::unwrap),
     );
     let p3 = calculate_var::<F>(
         t,
-        &Mercury::P3[0],
-        &Mercury::P3[1],
-        &Mercury::P3[2],
+        &Mercury::P3[0].map(F::from).map(Option::unwrap),
+        &Mercury::P3[1].map(F::from).map(Option::unwrap),
+        &Mercury::P3[2].map(F::from).map(Option::unwrap),
     );
     let p4 = calculate_var::<F>(
         t,
-        &Mercury::P4[0],
-        &Mercury::P4[1],
-        &Mercury::P4[2],
+        &Mercury::P4[0].map(F::from).map(Option::unwrap),
+        &Mercury::P4[1].map(F::from).map(Option::unwrap),
+        &Mercury::P4[2].map(F::from).map(Option::unwrap),
     );
 
     // We calculate the `t` potencies beforehand for easy re-use.

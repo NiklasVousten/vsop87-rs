@@ -107,7 +107,7 @@ impl Constants<f64> for Mercury {
 
     const P4: [[f64; 1]; 3] = P4;
 }
-
+/*
 impl Constants<f32> for Mercury {
     const A0: [[f32; 496]; 3] = todo!();
 
@@ -169,7 +169,7 @@ impl Constants<f32> for Mercury {
 
     const P4: [[f32; 1]; 3] = todo!();
 }
-
+ */
 pub(crate) const A0: [[f64; 496]; 3] = [
     [
         0.38709830982,

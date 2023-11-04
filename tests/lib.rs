@@ -1,15 +1,25 @@
-use vsop87::*;
+
+
+use duplicate::duplicate_item;
+
+#[duplicate_item(
+    float_type;
+    [ f32 ];
+    [ f64 ];
+  )]
+mod test {
+    use vsop87::*;
 
 #[test]
 fn it_kepler() {
-    let vsop87_elts = vsop87::mercury(2451545.0);
+    let vsop87_elts = vsop87::mercury::<float_type>(2451545.0);
 
-    assert!(vsop87_elts.a > 0.3870982121 && vsop87_elts.a < 0.3870982123);
-    assert!(vsop87_elts.l > 4.4026057778 && vsop87_elts.l < 4.4026057780);
-    assert!(vsop87_elts.k > 0.0446647517 && vsop87_elts.k < 0.0446647519);
-    assert!(vsop87_elts.h > 0.2007208957 && vsop87_elts.h < 0.2007208959);
-    assert!(vsop87_elts.q > 0.0406161540 && vsop87_elts.q < 0.0406161542);
-    assert!(vsop87_elts.p > 0.04563512 && vsop87_elts.p < 0.04563588);
+    assert!(vsop87_elts.a > 0.3870982121 && vsop87_elts.a < 0.3870982123, "{}", vsop87_elts.a);
+    assert!(vsop87_elts.l > 4.4026057778 && vsop87_elts.l < 4.4026057780, "{}", vsop87_elts.l);
+    assert!(vsop87_elts.k > 0.0446647517 && vsop87_elts.k < 0.0446647519, "{}", vsop87_elts.k);
+    assert!(vsop87_elts.h > 0.2007208957 && vsop87_elts.h < 0.2007208959, "{}", vsop87_elts.h);
+    assert!(vsop87_elts.q > 0.0406161540 && vsop87_elts.q < 0.0406161542, "{}", vsop87_elts.q);
+    assert!(vsop87_elts.p > 0.04563512 && vsop87_elts.p < 0.04563588, "{}", vsop87_elts.p);
 
     let elements = KeplerianElements::from(vsop87_elts);
 
@@ -23,7 +33,7 @@ fn it_kepler() {
 
 #[test]
 fn it_convert() {
-    let vsop87_elts = vsop87::mercury(2451545.0);
+    let vsop87_elts = vsop87::mercury::<float_type>(2451545.0);
 
     assert!(vsop87_elts.a > 0.3870982121 && vsop87_elts.a < 0.3870982123);
     assert!(vsop87_elts.l > 4.4026057778 && vsop87_elts.l < 4.4026057780);
@@ -33,7 +43,7 @@ fn it_convert() {
     assert!(vsop87_elts.p > 0.04563512 && vsop87_elts.p < 0.04563588);
 
     let kepler_elements = KeplerianElements::from(vsop87_elts);
-    let new_vsop87_elts: VSOP87Elements = kepler_elements.into();
+    let new_vsop87_elts: VSOP87Elements<float_type> = kepler_elements.into();
 
     assert!(new_vsop87_elts.a > 0.3870982121 && new_vsop87_elts.a < 0.3870982123);
     assert!(new_vsop87_elts.l > 4.4026057778 && new_vsop87_elts.l < 4.4026057780);
@@ -41,4 +51,6 @@ fn it_convert() {
     assert!(new_vsop87_elts.h > 0.2007208957 && new_vsop87_elts.h < 0.2007208959);
     assert!(new_vsop87_elts.q > 0.0406161540 && new_vsop87_elts.q < 0.0406161542);
     assert!(new_vsop87_elts.p > 0.04563512 && new_vsop87_elts.p < 0.04563588);
+}
+
 }
